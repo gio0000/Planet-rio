@@ -1,0 +1,41 @@
+-- Cria banco
+CREATE DATABASE simulador_planetas;
+
+USE simulador_planetas;
+
+-- Usuários
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL
+);
+
+-- Planetas criados pelos usuários
+CREATE TABLE planetas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    massa DOUBLE,
+    raio DOUBLE,
+    densidade DOUBLE,
+    atm VARCHAR(50),
+    temperatura DOUBLE,
+    superficie VARCHAR(50),
+    rotacao DOUBLE,
+    inclinacao DOUBLE,
+    distancia DOUBLE,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+);
+
+-- Cálculos selecionados por planeta
+CREATE TABLE calculos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    planeta_id INT NOT NULL,
+    gravidade BOOLEAN DEFAULT TRUE,
+    escape BOOLEAN DEFAULT TRUE,
+    vida BOOLEAN DEFAULT TRUE,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (planeta_id) REFERENCES planetas(id)
+);
+
