@@ -1,0 +1,33 @@
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+import java.io.FileOutputStream;
+
+public class PDFExemplo {
+    public static void main(String[] args) {
+        try {
+            Document documento = new Document();
+            PdfWriter.getInstance(documento, new FileOutputStream("PlanetaRelatorio.pdf"));
+            documento.open();
+            
+                documento.add(new Paragraph("===== Relatório do Planeta ====="));
+    documento.add(new Paragraph("Nome: Terra"));
+    documento.add(new Paragraph("Massa: 5.97e24 kg"));
+    documento.add(new Paragraph("Raio: 6.371e6 m"));
+    documento.add(new Paragraph("Densidade: 5514 kg/m³"));
+    documento.add(new Paragraph("Atmosfera: Oxigênio"));
+    documento.add(new Paragraph("Temperatura: 15 °C"));
+    documento.add(new Paragraph("Superfície: Rochoso"));
+    documento.add(new Paragraph("Rotação: 24 h"));
+    documento.add(new Paragraph("Inclinação: 23.5 °"));
+    documento.add(new Paragraph("Distância da estrela: 1 UA"));
+    documento.add(new Paragraph("Gravidade calculada: 9.816 m/s²"));
+    documento.add(new Paragraph("Velocidade de escape: 11.2 km/s"));
+    documento.add(new Paragraph("Possível vida: Possível vida complexa"));
+                
+            documento.close();
+            System.out.println("PDF criado com sucesso!");
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
