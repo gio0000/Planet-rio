@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Simulador Espacial Científico</title>
+<style>
+
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  background: #0a0a1a;
+  color: #e0e0e0;
+}
+canvas { display: block; }
+
+/* Estilo dos Cards */
+.ui-card {
+  position: absolute;
+  background: rgba(15, 15, 30, 0.95);
+  border: 1px solid rgba(100, 200, 255, 0.2);
+  border-radius: 8px;
+  padding: 14px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  width: 250px;
+  font-size: 14px;
+}
+.ui-card h3 {
+  text-align: center;
+  color: #4db6ff;
+  margin-bottom: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+label {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #b0c4de;
+}
+input, select {
+  width: 100%;
+  margin-top: 4px;
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(100, 200, 255, 0.2);
+  background: #111122;
+  color: #e0e0e0;
+  font-size: 13px;
+}
+
+/* Posicionamento */
+#card-propriedades { top: 20px; left: 20px; }
+#card-atmosfera { top: 20px; right: 20px; }
+#card-rotacao { top: calc(20px + 250px); right: 20px; }
+#card-vida { bottom: 80px; left: 50%; transform: translateX(-50%); width: 350px; text-align: center; }
+
+/* Botões Científicos */
+#botoes {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+}
+#botoes button {
+  padding: 10px 18px;
+  border: 1px solid rgba(100, 200, 255, 0.3);
+  border-radius: 6px;
+  background: #151530;
+  color: #e0e0e0;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+#botoes button:hover {
+  background: #1f1f45;
+  border-color: #4db6ff;
+  color: #ffffff;
+}
+
+/* Botões de tamanho */
+#size-buttons {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+#size-buttons button {
+  flex: 1;
+  padding: 6px;
+  font-size: 12px;
+  border: 1px solid rgba(100, 200, 255, 0.3);
+  border-radius: 4px;
+  background: #151530;
+  color: #b0c4de;
+  cursor: pointer;
+  transition: 0.2s;
+}
+#size-buttons button:hover {
+  background: #1f1f45;
+  border-color: #4db6ff;
+  color: #ffffff;
+}
+
+/* Info box */
+#info {
+  margin-top: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(100, 200, 255, 0.15);
+  font-size: 13px;
+  color: #cfd8dc;
+}
+</style>
+
+</head>
+<body>
+
+<div id="card-propriedades" class="ui-card">
+<h3>Propriedades</h3>
+<label>Massa (kg):</label><input type="number" id="massa" value="5.97e24">
+<label>Raio (m):</label><input type="number" id="raio" value="6.371e6">
+<label>Densidade (kg/m³):</label><input type="number" id="densidade" value="5514">
+<label>Luas:</label><input type="number" id="luas" value="1">
+<div id="size-buttons">
+  <button onclick="setSize(1)">Pequeno</button>
+  <button onclick="setSize(2)">Médio</button>
+  <button onclick="setSize(3)">Grande</button>
+</div>
+</div>
+
+<div id="card-atmosfera" class="ui-card">
+<h3>Atmosfera</h3>
+<label>Composição:</label>
+<select id="atm">
+  <option value="co2">CO₂</option>
+  <option value="nitrogenio">Nitrogênio</option>
+  <option value="oxigenio">Oxigênio</option>
+  <option value="hidrogenio">Hidrogênio</option>
+</select>
+<label>Temperatura (°C):</label><input type="number" id="temperatura" value="15">
+<label>Superfície:</label>
+<select id="textura">
+  <option value="rochoso">Rochoso</option>
+  <option value="gasoso">Gasoso</option>
+  <option value="aneis">Com Anéis</option>
+  <option value="vulcanico">Vulcânico</option>
+  <option value="glacial">Glacial</option>
+  <option value="metalico">Metálico</option>
+</select>
+</div>
+
+<div id="card-rotacao" class="ui-card">
+<h3>Rotação & Órbita</h3>
+<label>Rotação (h):</label><input type="number" id="rotacao" value="24">
+<label>Inclinação (°):</label><input type="number" id="inclinacao" value="23.5">
+<label>Distância da Estrela (UA):</label><input type="number" id="distancia" value="1">
+<div id="info">
+<p id="gravidade">Gravidade: 9.8 m/s²</p>
+<p id="escape">Velocidade de Escape: 11.2 km/s</p>
+</div>
+</div>
+
+<div id="card-vida" class="ui-card">
+<h3>Analisador de Vida</h3>
+<p id="vida">Possível vida: ???</p>
+</div>
+
+<div id="botoes">
+<button onclick="toggleRotation()">⏸️ Parar/Girar</button>
+<button onclick="atualizarPlaneta()">🔄 Atualizar</button>
+<button onclick="resetConfig()">♻️ Resetar</button>
+<button onclick="buracoNegro()">🕳️ Buraco Negro</button>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,5000);
+camera.position.z=5;
+const renderer=new THREE.WebGLRenderer({antialias:true,canvas:document.createElement('canvas')});
+renderer.setSize(window.innerWidth,window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Estrelas
+const starsGeometry=new THREE.BufferGeometry();
+const starsCount=2000;
+const positions=[];
+for(let i=0;i<starsCount;i++){positions.push((Math.random()-0.5)*2000,(Math.random()-0.5)*2000,(Math.random()-0.5)*2000);}
+starsGeometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
+const starsMaterial=new THREE.PointsMaterial({color:0xffffff,size:0.5});
+const stars=new THREE.Points(starsGeometry,starsMaterial);
+scene.add(stars);
+
+// Planeta
+const geometry=new THREE.SphereGeometry(1,64,64);
+const material=new THREE.MeshStandardMaterial({color:0x3399ff,roughness:0.7,metalness:0.2});
+const planeta=new THREE.Mesh(geometry,material);
+scene.add(planeta);
+
+// Anel
+const ringGeometry=new THREE.RingGeometry(1.2,1.5,64);
+const ringMaterial=new THREE.MeshBasicMaterial({color:0xff66cc, side:THREE.DoubleSide, transparent:true, opacity:0.5});
+const ring=new THREE.Mesh(ringGeometry,ringMaterial);
+ring.rotation.x=Math.PI/2;
+scene.add(ring);
+
+scene.add(new THREE.PointLight(0xffffff,1).position.set(10,10,10));
+scene.add(new THREE.AmbientLight(0x555555));
+
+let girando=true;
+
+// Atualizar planeta
+function atualizarPlaneta() {
+  const massa = parseFloat(document.getElementById("massa").value);
+  const raio = parseFloat(document.getElementById("raio").value);
+  planeta.scale.set(raio/6.371e6, raio/6.371e6, raio/6.371e6);
+
+  const atm = document.getElementById("atm").value;
+  const superficie = document.getElementById("textura").value;
+  let color = 0x3399ff;
+  if(atm === "co2") color = 0xff5533;
+  if(atm === "hidrogenio") color = 0xffff33;
+  if(atm === "nitrogenio") color = 0x33ff99;
+  if(atm === "oxigenio") color = 0x3399ff;
+  planeta.material.color.setHex(color);
+
+  // Gravidade (Newton)
+  const G = 6.674e-11;
+  const gravidade = (G * massa) / (raio * raio);
+
+  // Correção relativística
+  const c = 3e8;
+  const gravRel = gravidade / (1 - (2 * G * massa) / (raio * c * c));
+
+  document.getElementById("gravidade").innerText = 
+    "Gravidade (Newton/Relatividade): " + gravidade.toFixed(2) + " / " + gravRel.toFixed(2) + " m/s²";
+
+  // Velocidade de escape
+  const ve = Math.sqrt((2 * G * massa) / raio) / 1000;
+  document.getElementById("escape").innerText = "Velocidade de Escape: " + ve.toFixed(2) + " km/s";
+
+  // --- PARÂMETROS DE VIDA ---
+  const temp = parseFloat(document.getElementById("temperatura").value);
+  const densidade = parseFloat(document.getElementById("densidade").value);
+  const rotacao = parseFloat(document.getElementById("rotacao").value);
+  const inclinacao = parseFloat(document.getElementById("inclinacao").value);
+  const distancia = parseFloat(document.getElementById("distancia").value);
+
+  // Atmosfera ideal: oxigênio ou nitrogênio
+  const atmGood = (atm === "oxigenio" || atm === "nitrogenio");
+
+  // Condições base
+  const tempBoa = (temp >= 0 && temp <= 50);
+  const gravBoa = (gravidade >= 5 && gravidade <= 20); 
+  const rotBoa = (rotacao >= 10 && rotacao <= 48);
+  const inclBoa = (inclinacao >= 10 && inclinacao <= 40);
+  const zonaHabitavel = (distancia >= 0.7 && distancia <= 1.5);
+
+  // Superfície favorável: rochosa, vulcânica, metálica (permite solo firme e química)
+  const superficieBoa = (superficie === "rochoso" || superficie === "vulcanico" || superficie === "metalico");
+  // Superfície neutra: glacial (difícil mas não impossível)
+  const superficieNeutra = (superficie === "glacial");
+  // Superfície ruim: gasoso, só anéis, sem base sólida
+  const superficieRuim = (superficie === "gasoso" || superficie === "aneis");
+
+  let vidaTexto = "Impossível vida: Condições hostis detectadas.";
+
+  if(tempBoa && densidade > 2000 && atmGood && gravBoa && rotBoa && inclBoa && zonaHabitavel && superficieBoa){
+    vidaTexto = 
+      "Possível vida complexa: Condições muito próximas às da Terra. " +
+      "Temperatura ideal para água líquida, atmosfera rica em gases essenciais, " +
+      "gravidade equilibrada, rotação e inclinação estáveis, zona habitável e superfície sólida favorável.";
+  }
+  else if((temp > -30 && temp < 100) && densidade > 800 && gravidade > 2 && atmGood && (superficieBoa || superficieNeutra)){
+    vidaTexto =
+      "Vida microbiana possível: O ambiente suporta apenas formas simples. " +
+      "Condições extremas de temperatura, gravidade ou superfície limitam organismos complexos. " +
+      "Extremófilos poderiam sobreviver.";
+  }
+  else if(superficieRuim){
+    vidaTexto = 
+      "Improvável vida: Planeta sem superfície sólida estável. " +
+      "Ambientes gasosos ou apenas anéis não permitem vida baseada em carbono como conhecemos.";
+  }
+  else {
+    vidaTexto =
+      "Improvável vida: Parâmetros críticos como temperatura, gravidade, atmosfera ou órbita " +
+      "não permitem bioquímica terrestre. Apenas vida hipotética muito diferente poderia existir.";
+  }
+
+  document.getElementById("vida").innerText = vidaTexto;
+
+  // Anel visível só se selecionado
+  ring.visible = superficie === "aneis";
+}
+
+  // Anel visível só se selecionado
+  ring.visible = document.getElementById("textura").value === "aneis";
+
+
+
+  // Anel visível só se selecionado
+  ring.visible=document.getElementById("textura").value==="aneis";
+
+
+function animate(){
+  requestAnimationFrame(animate);
+  if(girando) planeta.rotation.y+=0.005;
+  stars.rotation.y+=0.0005;
+  renderer.render(scene,camera);
+}
+animate();
+
+function toggleRotation(){ girando=!girando; }
+function resetConfig(){
+  document.getElementById("massa").value=5.97e24;
+  document.getElementById("raio").value=6.371e6;
+  document.getElementById("densidade").value=5514;
+  document.getElementById("luas").value=1;
+  document.getElementById("atm").value="oxigenio";
+  document.getElementById("temperatura").value=15;
+  document.getElementById("textura").value="rochoso";
+  document.getElementById("rotacao").value=24;
+  document.getElementById("inclinacao").value=23.5;
+  document.getElementById("distancia").value=1;
+  atualizarPlaneta();
+}
+
+// Buraco negro
+function buracoNegro(){
+  girando=false;
+  let scale=1;
+  const id=setInterval(()=>{
+    scale*=0.9;
+    planeta.scale.set(scale,scale,scale);
+    if(scale<0.01){ clearInterval(id); resetConfig(); girando=true; }
+  },20);
+}
+
+// Explosão
+function explodirPlaneta(){
+  girando=false;
+  let scale=1;
+  const id=setInterval(()=>{
+    scale*=1.1;
+    planeta.scale.set(scale,scale,scale);
+    planeta.material.color.setHex(Math.random()*0xffffff);
+    if(scale>3){ clearInterval(id); resetConfig(); girando=true; }
+  },20);
+}
+
+// Botões de tamanho
+function setSize(op){
+  if(op===1) document.getElementById("raio").value=3.0e6;
+  if(op===2) document.getElementById("raio").value=6.371e6;
+  if(op===3) document.getElementById("raio").value=1.0e7;
+  atualizarPlaneta();
+}
+
+// Eventos
+document.querySelectorAll("input,select").forEach(el=>el.addEventListener("input",atualizarPlaneta));
+atualizarPlaneta();
+
+window.addEventListener("resize",()=>{
+  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universo Explorado - Espaço Sideral e Planetas</title>
+          
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #64b5f6;
+            --secondary: #9575cd;
+            --accent: #f48fb1;
+            --dark: #0a0a2a;
+            --darker: #050518;
+            --light: #e0e0e0;
+            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #2d1b69 100%);
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Particles Background */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        /* Stars Animation */
+        .stars-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 4px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 3px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 4px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            animation: stars-move 60s linear infinite;
+        }
+
+        @keyframes stars-move {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-200px); }
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--darker);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(10, 10, 42, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+        }
+
+        header.scrolled {
+            padding: 0.5rem 0;
+            background: rgba(5, 5, 24, 0.98);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+        }
+
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 20px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(100, 181, 246, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+        }
+
+        .hero-content {
+            max-width: 800px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: text-shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes text-shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero p {
+            font-size: 1.4rem;
+            margin-bottom: 2.5rem;
+            color: var(--light);
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 18px 35px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(100, 181, 246, 0.3);
+        }
+
+        /* Planets Section */
+        .planets {
+            padding: 120px 0;
+            background: linear-gradient(180deg, rgba(26, 26, 64, 0.6) 0%, transparent 100%);
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3.5rem;
+            margin-bottom: 4rem;
+            color: var(--primary);
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .planets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin-top: 4rem;
+        }
+
+        .planet-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .planet-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, transparent, transparent, var(--primary), transparent, transparent);
+            z-index: -1;
+            border-radius: 25px;
+            animation: border-glow 3s linear infinite;
+        }
+
+        @keyframes border-glow {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .planet-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .planet-image {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            margin: 0 auto 2rem;
+            overflow: hidden;
+            border: 4px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 50px rgba(100, 181, 246, 0.4);
+            position: relative;
+        }
+
+        .planet-image::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            opacity: 0;
+            transition: var(--transition);
+            border-radius: 50%;
+        }
+
+        .planet-card:hover .planet-image::before {
+            opacity: 0.3;
+        }
+
+        .planet-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+            filter: brightness(0.9) contrast(1.1);
+        }
+
+        .planet-card:hover .planet-image img {
+            transform: scale(1.15) rotate(5deg);
+            filter: brightness(1.1) contrast(1.2);
+        }
+
+        .planet-card h3 {
+            font-size: 2rem;
+            margin-bottom: 1.2rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .planet-info {
+            color: var(--light);
+            margin-bottom: 2rem;
+            line-height: 1.7;
+            opacity: 0.9;
+        }
+
+        .planet-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.8rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .stat span {
+            display: block;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.3rem;
+        }
+
+        /* Stars Section */
+        .stars {
+            padding: 120px 0;
+            position: relative;
+        }
+
+        .stars::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+
+        .stars-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .stars-text h2 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stars-text p {
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            opacity: 0.9;
+        }
+
+        .stars-image {
+            position: relative;
+            perspective: 1000px;
+        }
+
+        .stars-image img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            transform: rotate3d(1, 1, 0, 5deg);
+            transition: var(--transition);
+        }
+
+        .stars-image:hover img {
+            transform: rotate3d(1, 1, 0, 0deg) scale(1.02);
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(180deg, var(--darker) 0%, #050510 100%);
+            padding: 4rem 0 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 3rem;
+            text-align: left;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h3 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .footer-section p {
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--light);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.7;
+        }
+
+        /* Back to Top */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(100, 181, 246, 0.3);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary);
+            transform: translateY(-5px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+            
+            .stars-content {
+                gap: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+            }
+            
+            .nav-links {
+                gap: 1.5rem;
+            }
+            
+            .stars-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .section-title {
+                font-size: 2.8rem;
+            }
+            
+            .planets-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .section-title {
+                font-size: 2.2rem;
+            }
+            
+            .planet-card {
+                padding: 2rem;
+            }
+            
+            .planet-image {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--darker);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--primary), var(--secondary));
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(var(--secondary), var(--accent));
+        }
+         
+
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container nav-container">
+            <a href="#" class="logo">Planetário</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#planets">Sistema</a></li>
+                    <li><a href="#stars">Estrelas</a></li>
+
+                    
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+<section class="hero">
+    <div class="container hero-content">
+        <h1>Explorando o Cosmos</h1>
+        <p>Dê vida ao seu próprio universo e crie planetas únicos com apenas alguns cliques!.</p>
+        <a href="paginaplaneta.html" class="cta-button">Criar meu planeta</a>
+    </div>
+</section>
+
+
+    <!-- Planets Section -->
+    <section id="planets" class="planets">
+        <div class="container">
+            <h2 class="section-title">Sistema Solar</h2>
+            <div class="planets-grid">
+                <div class="planet-card">
+                    <div class="planet-image">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/d56a048b-1cf7-48ec-a135-4bb3dc92b846.png" alt="Planeta Mercúrio com superfície craterada e coloração cinza-escura sob luz solar intensa" />
+                    </div>
+                    <h3>Mercúrio</h3>
+                    <p>O planeta mais próximo do Sol, com temperaturas extremas que variam de 430°C durante o dia a -180°C à noite.</p>
+                </div>
+
+                <div class="planet-card">
+                    <div class="planet-image">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/873d3cc3-fb6d-41cc-9921-96d553a64e0d.png" alt="Vênus com atmosfera densa de nuvens amarelo-alaranjadas e superfície rochosa vulcânica" />
+                    </div>
+                    <h3>Vênus</h3>
+                    <p>Conhecido como Estrela d'Alva, possui uma atmosfera densa de CO₂ que cria um efeito estufa extremo.</p>
+                </div>
+
+                <div class="planet-card">
+                    <div class="planet-image">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/da866ea5-2554-4eda-8a13-3c1a304add96.png" alt="Planeta Terra visto do espaço mostrando oceanos azuis, continentes verdes e nuvens brancas" />
+                    </div>
+                    <h3>Terra</h3>
+                    <p>Nosso lar, o único planeta conhecido com vida, composto por 71% de água e atmosfera rica em oxigênio.</p>
+                </div>
+
+                <div class="planet-card">
+                    <div class="planet-image">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/aeb86af5-defc-424a-bfc3-fddaf678227d.png" alt="Marte com superfície avermelhada, crateras, cânions e calotas polares brancas" />
+                    </div>
+                    <h3>Marte</h3>
+                    <p>O Planeta Vermelho, com estações do ano similares à Terra e evidências de água líquida no passado.</p>
+                </div>
+
+                <div class="planet-card">
+                    <div class="planet-image">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e7845550-b6db-48b1-ae19-f31f97305725.png" alt="Júpiter gigante gasoso com bandas coloridas de nuvens e a Grande Mancha Vermelha" />
+                    </div>
+                    <h3>Júpiter</h3>
+                    <p>O maior planeta do sistema solar, um gigante gasoso com intensa atividade atmosférica e 79 luas conhecidas.</p>
+                </div>
+
+                <div class="planet-card">
+                    <div class="planet-image">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/31410876-ff25-4717-ae50-8d97a6e03960.png" alt="Saturno com seus anéis característicos compostos de gelo e rocha orbitando o planeta" />
+                    </div>
+                    <h3>Saturno</h3>
+                    <p>Famoso por seus anéis espetaculares, é um gigante gasoso com densidade menor que a água.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stars Section -->
+    <section id="stars" class="stars">
+        <div class="container">
+            <h2 class="section-title">Estrelas & Galáxias</h2>
+            <div class="stars-content">
+                <div class="stars-text">
+                    <h2>O Universo Infinito</h2>
+                    <p>As estrelas são gigantescas esferas de plasma que brilham devido às reações nucleares em seus núcleos. Nossa galáxia, a Via Láctea, contém bilhões de estrelas, incluindo o nosso Sol.</p>
+                    <p>As galáxias são imensos aglomerados de estrelas, planetas, gás e poeira cósmica, mantidos together pela força gravitacional. O universo observável contém trilhões de galáxias, cada uma com suas próprias características únicas.</p>
+                    <p>Desde as nebulosas onde nascem novas estrelas até os buracos negros supermassivos no centro das galáxias, o cosmos continua a nos surpreender com sua magnitude e beleza.</p>
+                </div>
+                <div class="stars-image">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/eb86cb26-e8b5-457b-a1ec-96aa487fd7a0.png" alt="Nebulosa colorida com tons de roxo, azul e rosa formando nuvens interestelares onde nascem novas estrelas" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Universo Explorado</h3>
+                    <p>Descubra as maravilhas do cosmos e expanda seus horizontes sobre o espaço sideral.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Explorar</h3>
+                    <p>Planetas</p>
+                    <p>Estrelas</p>
+                    <p>Galáxias</p>
+                    <p>Nebulosas</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Contato</h3>
+                    <p>Email: giordanastumm7@gmail.com</p>
+                    
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2024 Giordana. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Parallax effect for hero section
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            hero.style.backgroundPositionY = -(scrolled * 0.5) + 'px';
+        });
+
+        // Animation for planet cards on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all planet cards
+        document.querySelectorAll('.planet-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(50px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
+
